@@ -1,7 +1,7 @@
 import heapq
 class Tree:
     def __init__(self):
-        self.data = [20, 10, 5, 8, 3, 30, None]
+        self.data = [20, 10, 5, 8, 3, 30, 60]
 
     def subir(self, indice):
         if(self.data[indice] == None):
@@ -10,25 +10,6 @@ class Tree:
         if(self.data[indice_pai] > self.data[indice]):
             self.data[indice_pai], self.data[indice] = self.data[indice], self.data[indice_pai]
             self.subir(indice_pai)
-
-
-    def descer(self, pai):
-        indice_pai = self.data.index(pai)
-        if(self.data[indice_pai] == None):
-            return False
-        indice_filho_d = 2*indice_pai+2
-        indice_filho_e = 2*indice_pai+1
-        if indice_filho_d < len(self.data):
-            if self.data[indice_filho_d] < self.data[indice_filho_e]:
-                if(self.data[indice_filho_d] < self.data[indice_pai]):
-                    self.data[indice_filho_d], self.data[indice_pai] = self.data[indice_pai], self.data[indice_filho_d]
-                    self.descer(self.data[indice_filho_d])
-            else:
-                if(self.data[indice_filho_e] < self.data[indice_pai]):
-                    self.data[indice_filho_e], self.data[indice_pai] = self.data[indice_pai], self.data[indice_filho_e]
-                    self.descer(self.data[indice_filho_e])
-        else:
-            return False
             
     def heapify(self):
        maxi = len(self.data)
@@ -88,7 +69,7 @@ class Tree:
         Percorreremos então o intervalo [0, n // 2) da direita para a esquerda chamando a função descer.
         """
         for i in reversed(range(n//2)):
-            self._siftdown(i, 2*i+1)
+            self.descer(i)
 
 
     def _siftup(self, pos):
@@ -126,31 +107,35 @@ class Tree:
                 continue
             break
         heap[pos] = newitem
-"""
-    def descer(self, indice_pai, indice_filho):
+
+    def descer(self, indice_pai):
         if(self.data[indice_pai] == None):
             return
 
+        indice_filho = 2 * indice_pai + 1
         # verifica se passou do vetor (pai é folha) e existe filho esquerdo
         if(indice_filho >= len(self.data)):
             return 
 
         # verifica se o filho a direita existe e é menor
-        if(self.data[indice_filho+1] and self.data[indice_filho + 1] < self.data[indice_filho]):
+        if(self.data[indice_filho+1] and self.data[indice_filho+1] < self.data[indice_filho]):
             indice_filho += 1
 
-        # verifica o filho é folha
-        if(2*indice_filho+1 >= len(self.data)):
-            self.data[indice_filho], self.data[indice_pai] = self.data[indice_pai], self.data[indice_filho]
-        else:
-            self.descer(indice_pai, 2*indice_filho+1)
-"""
+        # verifica se não há condição de troca
+        if(self.data[indice_filho] >= self.data[indice_pai]):
+            return 
+
+        # troca e chama o descer
+        self.data[indice_filho], self.data[indice_pai] = self.data[indice_pai], self.data[indice_filho]
+        self.descer(indice_filho)
+    
+
        
 
 t = Tree()
 print(t)
 t.heapify()
 print(t)
-l = [20, 10, 5, 8, 3, 30]
+l = [20, 10, 5, 8, 3, 30, 60]
 heapq.heapify(l)
 print(l)
