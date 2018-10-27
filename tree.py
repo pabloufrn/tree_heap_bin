@@ -1,6 +1,7 @@
+import heapq
 class Tree:
     def __init__(self):
-        self.data = [15, 30, 45, 16, 50, 20, 3]
+        self.data = [20, 10, 5, 8, 3, 30, None]
 
     def subir(self, indice):
         if(self.data[indice] == None):
@@ -58,53 +59,98 @@ class Tree:
         return str(self.data)
 
 
-def heapify(x):
-    """Transform list into a heap, in-place, in O(len(x)) time."""
-    n = len(x)
-    # Transform bottom-up.  The largest index there's any point to looking at
-    # is the largest with a child index in-range, so must have 2*i + 1 < n,
-    # or i < (n-1)/2.  If n is even = 2*j, this is (2*j-1)/2 = j-1/2 so
-    # j-1 is the largest, which is n//2 - 1.  If n is odd = 2*j+1, this is
-    # (2*j+1-1)/2 = j so j-1 is the largest, and that's again n//2-1.
-    for i in reversed(range(n//2)):
-        _siftup(x, i)
+    def heapify(self):
+        n = len(self.data)
+        """
+        Se calcularmos pai do último indice temos que: 
+        indice_pai = (indice-1) // 2
+        indice_pai = (n-2) // 2
+        Se n é par, a divisão é perfeita, então:
+            indice_pai = ( n - 2 ) / 2
+            indice_pai = 2 * ( n / 2 - 1 ) / 2
+            indice_pai =  n / 2 - 1
 
-def _siftdown(heap, startpos, pos):
-    newitem = heap[pos]
-    # Follow the path to the root, moving parents down until finding a place
-    # newitem fits.
-    while pos > startpos:
-        parentpos = (pos - 1) >> 1
-        parent = heap[parentpos]
-        if newitem < parent:
-            heap[pos] = parent
-            pos = parentpos
-            continue
-        break
-    heap[pos] = newitem
+        Se n é ímpar, podemos considerar o cálculo do pai 
+        a partir do último filho à esquerda da lista, que 
+        fica na posição n-2, assim:
+            indice_pai = ( n - 3 ) / 2
+            indice_pai = ( n - 2 - 1 ) / 2
+            indice_pai = 2 * ( n/2 - 1 - 1 / 2 ) / 2
+            indice_pai = n/2 - 1/2 -1
+            indice_pai = n - 1 / 2 - 1
+        Se usamos a função piso, veremos que, para n impar:
+            n - 1 / 2 = n // 2
+        E para n par:
+            n / 2 =  n // 2 
+        Assim concluimos que o indice do nó mais a direita e mais profundo que não é folha é:
+            indice_pai = n // 2 - 1
 
-def _siftup(heap, pos):
-    endpos = len(heap)
-    startpos = pos
-    newitem = heap[pos]
-    # Bubble up the smaller child until hitting a leaf.
-    childpos = 2*pos + 1    # leftmost child position
-    while childpos < endpos:
-        # Set childpos to index of smaller child.
-        rightpos = childpos + 1
-        if rightpos < endpos and not heap[childpos] < heap[rightpos]:
-            childpos = rightpos
-        # Move the smaller child up.
-        heap[pos] = heap[childpos]
-        pos = childpos
-        childpos = 2*pos + 1
-    # The leaf at pos is empty now.  Put newitem there, and bubble it up
-    # to its final resting place (by sifting its parents down).
-    heap[pos] = newitem
-    _siftdown(heap, startpos, pos)
+        Percorreremos então o intervalo [0, n // 2) da direita para a esquerda chamando a função descer.
+        """
+        for i in reversed(range(n//2)):
+            self._siftdown(i, 2*i+1)
+
+
+    def _siftup(self, pos):
+        heap = self.data
+        endpos = len(heap)
+        startpos = pos
+        newitem = heap[pos]
+        # Bubble up the smaller child until hitting a leaf.
+        childpos = 2*pos + 1    # leftmost child position
+        while childpos < endpos:
+            # Set childpos to index of smaller child.
+            rightpos = childpos + 1
+            if rightpos < endpos and not heap[childpos] < heap[rightpos]:
+                childpos = rightpos
+            # Move the smaller child up.
+            heap[pos] = heap[childpos]
+            pos = childpos
+            childpos = 2*pos + 1
+        # The leaf at pos is empty now.  Put newitem there, and bubble it up
+        # to its final resting place (by sifting its parents down).
+        heap[pos] = newitem
+        self._siftdown(startpos, pos)
+
+    def _siftdown(self, startpos, pos):
+        heap = self.data
+        newitem = heap[pos]
+        # Follow the path to the root, moving parents down until finding a place
+        # newitem fits.
+        while pos > startpos:
+            parentpos = (pos - 1) >> 1
+            parent = heap[parentpos]
+            if newitem < parent:
+                heap[pos] = parent
+                pos = parentpos
+                continue
+            break
+        heap[pos] = newitem
+"""
+    def descer(self, indice_pai, indice_filho):
+        if(self.data[indice_pai] == None):
+            return
+
+        # verifica se passou do vetor (pai é folha) e existe filho esquerdo
+        if(indice_filho >= len(self.data)):
+            return 
+
+        # verifica se o filho a direita existe e é menor
+        if(self.data[indice_filho+1] and self.data[indice_filho + 1] < self.data[indice_filho]):
+            indice_filho += 1
+
+        # verifica o filho é folha
+        if(2*indice_filho+1 >= len(self.data)):
+            self.data[indice_filho], self.data[indice_pai] = self.data[indice_pai], self.data[indice_filho]
+        else:
+            self.descer(indice_pai, 2*indice_filho+1)
+"""
        
 
-t = [15, 30, 45, 16, 50, 20, 3]
+t = Tree()
 print(t)
-heapify(t)
+t.heapify()
 print(t)
+l = [20, 10, 5, 8, 3, 30]
+heapq.heapify(l)
+print(l)
