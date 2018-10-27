@@ -3,42 +3,68 @@ class Tree:
     def __init__(self):
         self.data = [20, 10, 5, 8, 3, 30, 60]
 
-    def subir(self, indice):
-        if(self.data[indice] == None):
+    def subir(self, indice_filho):
+        if(indice_filho == 0):
+            return 
+        if(self.data[indice_filho] == None):
             return
-        indice_pai = round((indice-1)/2)
-        if(self.data[indice_pai] > self.data[indice]):
-            self.data[indice_pai], self.data[indice] = self.data[indice], self.data[indice_pai]
-            self.subir(indice_pai)
-            
-    def heapify(self):
-       maxi = len(self.data)
-       i = 0
-       while i < maxi:
-            index = i
-            left = 2*i+1
-            right = 2*i+2
-            if left < maxi and self.data[left] > self.data[index]:
-                index = left
-            if right < maxi and self.data[right] > self.data[index]:
-                index = right
-            if index == i:
-                return
-            self.data[i], self.data[index] = self.data[index], self.data[i]
-            i = index
-             
 
-    def pop(self, indice):
-        filho_atual = indice
-        while(self.data[filho_atual] != None):
-            filho_atual = 2*filho_atual+1
-        folha = round((filho_atual-1)/2)
-        self.data[indice] = self.data[folha]
+        indice_pai = (indice_filho-1) // 2
+        if(self.data[indice_pai] > self.data[indice_filho]):
+            self.data[indice_pai], self.data[indice_filho] = self.data[indice_filho], self.data[indice_pai]
+            self.subir(indice_pai)
+
+    def descer(self, indice_pai):
+        if(self.data[indice_pai] == None):
+            return
+
+        indice_filho = 2 * indice_pai + 1
+        # verifica se passou do vetor (pai é folha) e existe filho esquerdo
+        if(indice_filho >= len(self.data) or not self.data[indice_filho]):
+            return 
+
+        # verifica se o filho a direita existe e é menor
+        if(self.data[indice_filho+1] and self.data[indice_filho+1] < self.data[indice_filho]):
+            indice_filho += 1
+
+        # verifica se não há condição de troca
+        if(self.data[indice_filho] >= self.data[indice_pai]):
+            return 
+
+        # troca e chama o descer
+        self.data[indice_filho], self.data[indice_pai] = self.data[indice_pai], self.data[indice_filho]
+        self.descer(indice_filho)
+
+    def push(self, valor):
+        n = len(self.data)
+        folha = len(n-1)
+        while folha > 0 and self.data[folha] == None:
+            folha -= 1
+
+        self.data.append()
+        if(folha == n-1):
+            """ Adiciona mais elementos da lista ( dobro do último nível)"""
+            self.data += ( n + 1 ) * [None] 
+
+        self.data[folha] = valor
+        subir(folha)
+
+             
+    def pop(self):
+        folha = len(self.data-1)
+        while folha > 0 and self.data[folha] == None:
+            folha -= 1
+        self.data[0] = self.data[folha]
         self.data[folha] = None
+
+        if(folha == n // 2):
+            # tira o ultimo nivel
+            self.data = self.data[:n//2]
+
+        self.descer(0)
 
     def __str__(self):
         return str(self.data)
-
 
     def heapify(self):
         n = len(self.data)
@@ -70,64 +96,6 @@ class Tree:
         """
         for i in reversed(range(n//2)):
             self.descer(i)
-
-
-    def _siftup(self, pos):
-        heap = self.data
-        endpos = len(heap)
-        startpos = pos
-        newitem = heap[pos]
-        # Bubble up the smaller child until hitting a leaf.
-        childpos = 2*pos + 1    # leftmost child position
-        while childpos < endpos:
-            # Set childpos to index of smaller child.
-            rightpos = childpos + 1
-            if rightpos < endpos and not heap[childpos] < heap[rightpos]:
-                childpos = rightpos
-            # Move the smaller child up.
-            heap[pos] = heap[childpos]
-            pos = childpos
-            childpos = 2*pos + 1
-        # The leaf at pos is empty now.  Put newitem there, and bubble it up
-        # to its final resting place (by sifting its parents down).
-        heap[pos] = newitem
-        self._siftdown(startpos, pos)
-
-    def _siftdown(self, startpos, pos):
-        heap = self.data
-        newitem = heap[pos]
-        # Follow the path to the root, moving parents down until finding a place
-        # newitem fits.
-        while pos > startpos:
-            parentpos = (pos - 1) >> 1
-            parent = heap[parentpos]
-            if newitem < parent:
-                heap[pos] = parent
-                pos = parentpos
-                continue
-            break
-        heap[pos] = newitem
-
-    def descer(self, indice_pai):
-        if(self.data[indice_pai] == None):
-            return
-
-        indice_filho = 2 * indice_pai + 1
-        # verifica se passou do vetor (pai é folha) e existe filho esquerdo
-        if(indice_filho >= len(self.data)):
-            return 
-
-        # verifica se o filho a direita existe e é menor
-        if(self.data[indice_filho+1] and self.data[indice_filho+1] < self.data[indice_filho]):
-            indice_filho += 1
-
-        # verifica se não há condição de troca
-        if(self.data[indice_filho] >= self.data[indice_pai]):
-            return 
-
-        # troca e chama o descer
-        self.data[indice_filho], self.data[indice_pai] = self.data[indice_pai], self.data[indice_filho]
-        self.descer(indice_filho)
     
 
        
