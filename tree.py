@@ -107,3 +107,4 @@ print(t)
 l = [20, 10, 5, 8, 3, 30, 60]
 heapq.heapify(l)
 print(l)
+print("mudei um negócio aqui")
